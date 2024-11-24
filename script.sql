@@ -7,6 +7,11 @@
 
 -- Started on 2024-11-16 17:32:26
 
+CREATE DATABASE collaresbruno;
+
+\c collaresbruno;
+
+
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -338,7 +343,7 @@ CREATE TABLE public.usuarios (
     user_id integer NOT NULL,
     nombre character varying(100) NOT NULL,
     email character varying(100) NOT NULL,
-    "contraseña" character varying(255) NOT NULL,
+    contrasena character varying(255) NOT NULL,
     rol character varying(20) NOT NULL,
     direccion character varying(255),
     ciudad character varying(100),
@@ -438,167 +443,6 @@ ALTER TABLE ONLY public.productos ALTER COLUMN producto_id SET DEFAULT nextval('
 
 ALTER TABLE ONLY public.usuarios ALTER COLUMN user_id SET DEFAULT nextval('public.usuarios_user_id_seq'::regclass);
 
-
---
--- TOC entry 4937 (class 0 OID 114804)
--- Dependencies: 229
--- Data for Name: administrar_productos; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.administrar_productos (admin_id, producto_id, accion, fecha_accion) FROM stdin;
-\.
-
-
---
--- TOC entry 4928 (class 0 OID 114722)
--- Dependencies: 220
--- Data for Name: carrito; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.carrito (carrito_id, user_id, producto_id, cantidad) FROM stdin;
-\.
-
-
---
--- TOC entry 4932 (class 0 OID 114755)
--- Dependencies: 224
--- Data for Name: detalles_pedido; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.detalles_pedido (detalle_id, pedido_id, producto_id, cantidad, precio) FROM stdin;
-\.
-
-
---
--- TOC entry 4934 (class 0 OID 114773)
--- Dependencies: 226
--- Data for Name: favoritos; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.favoritos (favorito_id, user_id, producto_id) FROM stdin;
-\.
-
-
---
--- TOC entry 4939 (class 0 OID 114820)
--- Dependencies: 231
--- Data for Name: mis_compras; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.mis_compras (compra_id, user_id, pedido_id, fecha_compra) FROM stdin;
-\.
-
-
---
--- TOC entry 4936 (class 0 OID 114790)
--- Dependencies: 228
--- Data for Name: pagos; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.pagos (pago_id, pedido_id, monto, fecha_pago, estado_pago) FROM stdin;
-\.
-
-
---
--- TOC entry 4930 (class 0 OID 114740)
--- Dependencies: 222
--- Data for Name: pedidos; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.pedidos (pedido_id, user_id, fecha_pedido, estado, total) FROM stdin;
-\.
-
-
---
--- TOC entry 4926 (class 0 OID 114711)
--- Dependencies: 218
--- Data for Name: productos; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.productos (producto_id, nombre, descripcion, precio, talla, color, stock, imagen, fecha_agregado) FROM stdin;
-\.
-
-
---
--- TOC entry 4924 (class 0 OID 114698)
--- Dependencies: 216
--- Data for Name: usuarios; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.usuarios (user_id, nombre, email, "contraseña", rol, direccion, ciudad, pais, fecha_registro) FROM stdin;
-\.
-
-
---
--- TOC entry 4953 (class 0 OID 0)
--- Dependencies: 219
--- Name: carrito_carrito_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.carrito_carrito_id_seq', 1, false);
-
-
---
--- TOC entry 4954 (class 0 OID 0)
--- Dependencies: 223
--- Name: detalles_pedido_detalle_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.detalles_pedido_detalle_id_seq', 1, false);
-
-
---
--- TOC entry 4955 (class 0 OID 0)
--- Dependencies: 225
--- Name: favoritos_favorito_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.favoritos_favorito_id_seq', 1, false);
-
-
---
--- TOC entry 4956 (class 0 OID 0)
--- Dependencies: 230
--- Name: mis_compras_compra_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.mis_compras_compra_id_seq', 1, false);
-
-
---
--- TOC entry 4957 (class 0 OID 0)
--- Dependencies: 227
--- Name: pagos_pago_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.pagos_pago_id_seq', 1, false);
-
-
---
--- TOC entry 4958 (class 0 OID 0)
--- Dependencies: 221
--- Name: pedidos_pedido_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.pedidos_pedido_id_seq', 1, false);
-
-
---
--- TOC entry 4959 (class 0 OID 0)
--- Dependencies: 217
--- Name: productos_producto_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.productos_producto_id_seq', 1, false);
-
-
---
--- TOC entry 4960 (class 0 OID 0)
--- Dependencies: 215
--- Name: usuarios_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.usuarios_user_id_seq', 1, false);
 
 
 --
@@ -797,3 +641,23 @@ ALTER TABLE ONLY public.pedidos
 --
 
 
+
+-- Insertar un usuario administrador
+INSERT INTO usuarios (nombre, email, contrasena, rol, direccion, ciudad, pais) 
+VALUES ('Administrador', 'admin@bruno.cl', 'Admin9876*', 'administrador', 'Calle Principal 123', 'Santiago', 'Chile');
+
+-- Insertar un usuario cliente
+INSERT INTO usuarios (nombre, email, contrasena, rol, direccion, ciudad, pais) 
+VALUES ('Cliente', 'cliente@example.com', 'cliente123', 'cliente', 'Avenida Secundaria 456', 'Santiago', 'Chile');
+
+
+-- Insertar productos 
+INSERT INTO productos (nombre, descripcion, precio, talla, color, stock, imagen) VALUES
+('Belanova', 'Collar de nylon resistente, ajustable, disponible en colores vibrantes. Ideal para perros pequeños y medianos.', 15950, 'S/M', 'Variados', 10, '/assets/img-cards/collar-perro-metal-azul-cielo.jpg'),
+('Winter', 'Collar acolchado, resistente al agua, flexible y perfecto para mantener a tu perro cómodo en climas fríos.', 12250, 'S/M/L', 'Negro', 15, '/assets/img-cards/collar-perro-metal-dorado.jpg'),
+('Luna', 'Elegante collar de cuero de alta calidad, robusto y duradero, ideal para perros que necesitan un toque de estilo.', 13990, 'M/L', 'Marrón', 8, '/assets/img-cards/collar-perro-moni-beige.jpg'),
+('Titán', 'Collar suave con cristales brillantes, perfecto para perros pequeños, disponible en colores pastel.', 12590, 'S', 'Rosa/Azul/Lila', 12, '/assets/img-cards/collar-perro-moni-gris.jpg'),
+('Golden', 'Collar reflectante y ajustable, resistente y ideal para perros activos que disfrutan de la aventura.', 16450, 'S/M/L', 'Amarillo', 20, '/assets/img-cards/collar-perro-moni-rosa.jpg'),
+('Simba', 'Moderno y acolchado collar para perros de tamaño mediano y grande, cómodo para el uso diario.', 15500, 'M/L', 'Azul', 5, '/assets/img-cards/collar-perro-nara-azul.jpg'),
+('Nova', 'Collar de alta resistencia para perros grandes, con cierre de seguridad y colores oscuros.', 12950, 'L', 'Negro/Marrón', 10, '/assets/img-cards/collar-perro-nara-lila-.jpg'),
+('Labrador', 'Collar suave y ligero, ajustable, con un diseño divertido para perros de todos los tamaños.', 6890, 'S/M/L', 'Variados', 25, '/assets/img-cards/collar-perro-metal-rosa-.jpg');
