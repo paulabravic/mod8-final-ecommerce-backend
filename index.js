@@ -106,4 +106,6 @@ app.use("*", (req, res) => {
   res.status(404).json("Página no encontrada");
 });
 
-app.listen(port, () => console.log("servidor escuchado en puerto 3000"));
+app.listen(port, () => console.log(`servidor escuchado en puerto ${port}`));
+
+module.exports = app; // Exportar la instancia de la aplicación Express

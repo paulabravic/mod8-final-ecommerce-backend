@@ -1,0 +1,7 @@
+PORT_SERVER=3000
+SECRET_JWT_KEY="6K!U?ñx¡Yk7T7P7Q7pZ$Aa~Y2"
+DB_USER="postgres"
+DB_HOST="localhost"
+DB_PASSWORD="123456"
+DB_NAME="collaresbruno"
+DB_PORT=5432
