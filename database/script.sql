@@ -644,11 +644,11 @@ ALTER TABLE ONLY public.pedidos
 
 -- Insertar un usuario administrador
 INSERT INTO usuarios (nombre, email, contrasena, rol, direccion, ciudad, pais) 
-VALUES ('Administrador', 'admin@bruno.cl', 'Admin9876*', 'administrador', 'Calle Principal 123', 'Santiago', 'Chile');
+VALUES ('Administrador', 'admin@bruno.cl', '$2a$10$ltu3uTAnrR0N7agpNNJm1.KKYkffXMzxt1Y3epbncvAeXkTauM9Q2', 'administrador', 'Calle Principal 123', 'Santiago', 'Chile');
 
 -- Insertar un usuario cliente
 INSERT INTO usuarios (nombre, email, contrasena, rol, direccion, ciudad, pais) 
-VALUES ('Cliente', 'cliente@example.com', 'cliente123', 'cliente', 'Avenida Secundaria 456', 'Santiago', 'Chile');
+VALUES ('Cliente', 'cliente@example.com', '$2a$10$R3lSSMULTMHwqzTFL4v6ZO5ig20/j3qHDy32ilrufzhA6QcAr3TvO', 'cliente', 'Avenida Secundaria 456', 'Santiago', 'Chile');
 
 
 -- Insertar productos 
