@@ -1,6 +1,5 @@
-const { JWT_SECRET_KEY } = require('./config'); 
 const jwt = require('jsonwebtoken');
-
+const JWT_SECRET_KEY = process.env.SECRET_JWT_KEY;
 
 // Middleware para verificar la existencia de credenciales
 function verificarCredencialesMiddleware(req, res, next) {

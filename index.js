@@ -1,7 +1,6 @@
 require('dotenv').config();
-const { verificarCredenciales, getUserByEmail, agregarUser } = require('./consultas');
-const { verificarCredencialesMiddleware, validarTokenMiddleware } = require('./middlewares');
-const { JWT_SECRET_KEY } = require('./config');
+const { verificarCredenciales, getUserByEmail, agregarUser } = require('./database/consultas');
+const { verificarCredencialesMiddleware, validarTokenMiddleware } = require('./middleware/middlewares');
 const cors = require("cors");
 const express = require("express");
 const jwt = require("jsonwebtoken");

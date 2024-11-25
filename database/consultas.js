@@ -2,14 +2,13 @@ const { Pool } = require("pg");
 const bcrypt = require('bcryptjs');
 
 const pool = new Pool({
-    user: "postgres",
-    host: "localhost",
-    password: "123456",
-    database: "collaresbruno",
-    port: 5432,
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT,
     allowExitOnIdle: true
 });
-
 
 const verificarCredenciales = async (email, password) => {
     const consulta = "SELECT * FROM usuarios WHERE email = $1 LIMIT 1";
