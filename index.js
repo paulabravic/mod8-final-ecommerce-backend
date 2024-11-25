@@ -31,16 +31,20 @@ app.get("/", async (req, res) => {
   }
 });
 
+
+//=====================================================================
+// LOGIN
+//=====================================================================
 app.post("/login", verificarCredencialesMiddleware, async (req, res) => {
   try {
     const { email, password } = req.body;
-    const { validCredentials, nombre } = await verificarCredenciales(
+    const { validCredentials, nombre, rol } = await verificarCredenciales(
       email,
       password
     );
 
     if (validCredentials) {
-      const token = jwt.sign({ email: email, nombre: nombre }, JWT_SECRET_KEY);
+      const token = jwt.sign({ email: email, nombre: nombre, rol: rol }, JWT_SECRET_KEY);
       res.send({ token });
     } else {
       throw { code: 404, message: "No se encontró ningún usuario con estas credenciales" };
@@ -51,6 +55,9 @@ app.post("/login", verificarCredencialesMiddleware, async (req, res) => {
   }
 });
 
+//=====================================================================
+// USUARIOS
+//=====================================================================
 app.post("/usuarios", verificarCredencialesMiddleware, async (req, res) => {
   try {
     const { nombre, email, password, direccion, ciudad, pais } = req.body;
@@ -79,6 +86,9 @@ app.get("/usuarios", validarTokenMiddleware, async (req, res) => {
 });
 
 
+//=====================================================================
+// PRODUCTOS
+//=====================================================================
 app.get("/productos", async (req, res) => {
   try {
     const productos = await obtenerProductos(); 

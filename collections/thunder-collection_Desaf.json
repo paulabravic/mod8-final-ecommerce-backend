@@ -2,7 +2,7 @@
     "clientName": "Thunder Client",
     "collectionName": "Desaf",
     "collectionId": "83aaed69-985e-4ed1-a8f7-2dbba1cc5a56",
-    "dateExported": "2024-11-25T04:33:59.342Z",
+    "dateExported": "2024-11-25T05:18:57.374Z",
     "version": "1.2",
     "folders": [],
     "requests": [
@@ -27,11 +27,11 @@
             "method": "POST",
             "sortNum": 30000,
             "created": "2024-11-25T03:14:21.180Z",
-            "modified": "2024-11-25T04:16:47.637Z",
+            "modified": "2024-11-25T04:52:37.799Z",
             "headers": [],
             "body": {
                 "type": "json",
-                "raw": "{ \r\n  \"email\":\"admin@bruno.cl\", \r\n  \"password\":\"Admin9876*\" \r\n} ",
+                "raw": "{ \r\n  \"email\":\"cliente@example.com\", \r\n  \"password\":\"test1234\" \r\n} ",
                 "form": []
             }
         },
@@ -44,12 +44,28 @@
             "method": "POST",
             "sortNum": 40000,
             "created": "2024-11-25T03:18:13.812Z",
-            "modified": "2024-11-25T03:19:38.923Z",
+            "modified": "2024-11-25T05:18:15.673Z",
             "headers": [],
             "body": {
                 "type": "json",
-                "raw": "{\n  \"nombre\": \"Juan Perez\",\n  \"email\": \"juan.perez@example.com\",\n  \"password\": \"Juan1234\",\n  \"direccion\": \"Calle Los Pinos 456\",\n  \"ciudad\": \"Santiago\",\n  \"pais\": \"Chile\"\n}",
+                "raw": "{\n  \"nombre\": \"Juan Perez\",\n  \"email\": \"juan.perez.03@example.com\",\n  \"password\": \"Juan1234\",\n  \"direccion\": \"Calle Los Pinos 456\",\n  \"ciudad\": \"Santiago\",\n  \"pais\": \"Chile\"\n}",
                 "form": []
+            }
+        },
+        {
+            "_id": "60c6a368-db9b-4f6f-a936-ecbc4f683eb0",
+            "colId": "83aaed69-985e-4ed1-a8f7-2dbba1cc5a56",
+            "containerId": "",
+            "name": "Usuarios",
+            "url": "http://localhost:3000/usuarios",
+            "method": "GET",
+            "sortNum": 45000,
+            "created": "2024-11-25T05:05:42.136Z",
+            "modified": "2024-11-25T05:06:27.209Z",
+            "headers": [],
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGJydW5vLmNsIiwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTczMjUwODMxN30.XsWBsR98E83BpGDBnd-L5b3EvAWu3jWH4pxBD6ZSH1E"
             }
         },
         {
@@ -86,5 +102,5 @@
             }
         }
     ],
-    "ref": "fMoLY--psaHTOLgVnlBtqVCGjdJfv2tvqdffxi0zt5z0aMXLyznVDBPsY1BhaDH5dF4qpjSvsIbvOYp1SlGdMw"
+    "ref": "fMoLY--psaHTOLgVnlBtqeRvlm23pm3b5GNegFK027KIkZcRLbHYz3zQ6Owei2qtMyvSMEHOkS-QO7PEe1Q06Q"
 }
