@@ -3,6 +3,8 @@ const {
   verificarCredenciales,
   getUserByEmail,
   agregarUser,
+  obtenerProductos,
+  crearProducto
 } = require("./database/consultas");
 const {
   verificarCredencialesMiddleware,
@@ -23,9 +25,9 @@ app.use(morgan("dev"));
 
 app.get("/", async (req, res) => {
   try {
-    res.json("Bienvenido a la API  de Collares Bruno");
+    res.json("Bienvenido a la API de Collares Bruno");
   } catch (error) {
-    res.status(500).json("Un error ha ocurrido: " + error);
+    res.status(error.code || 500).json("Un error ha ocurrido: " + error);
   }
 });
 
@@ -45,7 +47,7 @@ app.post("/login", verificarCredencialesMiddleware, async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(error.code || 500).send(error);
+    res.status(error.code || 500).send({code: error.code || 500, message: error.message});
   }
 });
 
@@ -62,7 +64,7 @@ app.post("/usuarios", verificarCredencialesMiddleware, async (req, res) => {
     });
     res.json({ mensaje: "Usuario agregado con éxito" });
   } catch (error) {
-    res.status(500).send(error.message);
+    res.status(500).send({code: error.code || 500, message: error.message});
   }
 });
 
@@ -75,6 +77,30 @@ app.get("/usuarios", validarTokenMiddleware, async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+
+app.get("/productos", async (req, res) => {
+  try {
+    const productos = await obtenerProductos(); 
+    res.json(productos);
+  } catch (error) {
+    console.error("Error al obtener productos:", error); 
+    res.status(500).json({code: error.code || 500, message: error.message}); 
+  }
+});
+
+app.post("/productos", validarTokenMiddleware, async (req, res) => {
+  try {
+    const nuevoProducto = req.body; 
+    const productoCreado = await crearProducto(nuevoProducto, req.user.email); 
+    res.status(201).json(productoCreado);
+  } catch (error) {
+    console.error("Error al crear producto:", error);
+    res.status(error.code || 500).json({code: error.code || 500, message: error.message}); 
+  }
+});
+
+
 
 app.use("*", (req, res) => {
   res.status(404).json("Página no encontrada");

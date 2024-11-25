@@ -1,0 +1,90 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "Desaf",
+    "collectionId": "83aaed69-985e-4ed1-a8f7-2dbba1cc5a56",
+    "dateExported": "2024-11-25T04:33:59.342Z",
+    "version": "1.2",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "0cc0ea6b-f224-4597-9aae-1c5dad9af483",
+            "colId": "83aaed69-985e-4ed1-a8f7-2dbba1cc5a56",
+            "containerId": "",
+            "name": "Get",
+            "url": "http://localhost:3000",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2024-09-29T23:36:31.491Z",
+            "modified": "2024-09-29T23:36:31.491Z",
+            "headers": []
+        },
+        {
+            "_id": "a42b5ea5-ece4-4d2d-ab9f-890fb473c60a",
+            "colId": "83aaed69-985e-4ed1-a8f7-2dbba1cc5a56",
+            "containerId": "",
+            "name": "Login",
+            "url": "http://localhost:3000/login",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2024-11-25T03:14:21.180Z",
+            "modified": "2024-11-25T04:16:47.637Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{ \r\n  \"email\":\"admin@bruno.cl\", \r\n  \"password\":\"Admin9876*\" \r\n} ",
+                "form": []
+            }
+        },
+        {
+            "_id": "cb7cfa81-0546-45bb-b44e-38c5f5237b82",
+            "colId": "83aaed69-985e-4ed1-a8f7-2dbba1cc5a56",
+            "containerId": "",
+            "name": "Usuarios",
+            "url": "http://localhost:3000/usuarios",
+            "method": "POST",
+            "sortNum": 40000,
+            "created": "2024-11-25T03:18:13.812Z",
+            "modified": "2024-11-25T03:19:38.923Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"nombre\": \"Juan Perez\",\n  \"email\": \"juan.perez@example.com\",\n  \"password\": \"Juan1234\",\n  \"direccion\": \"Calle Los Pinos 456\",\n  \"ciudad\": \"Santiago\",\n  \"pais\": \"Chile\"\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "16356d77-de0e-4286-b536-37991b42cbb5",
+            "colId": "83aaed69-985e-4ed1-a8f7-2dbba1cc5a56",
+            "containerId": "",
+            "name": "Productos",
+            "url": "http://localhost:3000/productos",
+            "method": "GET",
+            "sortNum": 50000,
+            "created": "2024-11-25T03:50:51.318Z",
+            "modified": "2024-11-25T04:12:52.715Z",
+            "headers": []
+        },
+        {
+            "_id": "972a7e3f-493e-4ef5-a8ae-462bb261b48e",
+            "colId": "83aaed69-985e-4ed1-a8f7-2dbba1cc5a56",
+            "containerId": "",
+            "name": "Productos",
+            "url": "http://localhost:3000/productos",
+            "method": "POST",
+            "sortNum": 60000,
+            "created": "2024-11-25T04:13:08.964Z",
+            "modified": "2024-11-25T04:33:41.592Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\r\n  \"nombre\": \"Collar Estrella\",\r\n  \"descripcion\": \"Collar brillante con diseño de estrella\",\r\n  \"precio\": 14990,\r\n  \"talla\": \"S/M\",\r\n  \"color\": \"Plateado\",\r\n  \"stock\": 10,\r\n  \"imagen\": \"/assets/img-cards/collar-estrella.jpg\" \r\n}",
+                "form": []
+            },
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGJydW5vLmNsIiwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTczMjUwODMxN30.XsWBsR98E83BpGDBnd-L5b3EvAWu3jWH4pxBD6ZSH1E"
+            }
+        }
+    ],
+    "ref": "fMoLY--psaHTOLgVnlBtqVCGjdJfv2tvqdffxi0zt5z0aMXLyznVDBPsY1BhaDH5dF4qpjSvsIbvOYp1SlGdMw"
+}

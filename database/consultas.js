@@ -43,4 +43,44 @@ const agregarUser = async ({ nombre, email, password, direccion, ciudad, pais })
   return res.rows;
 };
 
-module.exports = { verificarCredenciales, getUserByEmail, agregarUser }
+const obtenerRolDelUsuario = async (email) => {
+    const consulta = "SELECT rol FROM usuarios WHERE email = $1";
+    const valores = [email];
+    const { rows } = await pool.query(consulta, valores);
+    return rows[0].rol; 
+  };
+
+const obtenerProductos = async () => {
+    const consulta = "SELECT producto_id, nombre, descripcion, FLOOR(precio) AS precio, talla, color, stock, imagen FROM productos";
+    const { rows } = await pool.query(consulta);
+    return rows;
+  };
+
+  const crearProducto = async (producto, emailUsuario) => {
+
+    // Verificar si el usuario es administrador
+    const rol = await obtenerRolDelUsuario(emailUsuario); 
+
+    if (rol !== 'administrador') {
+      throw { code: 403, message: 'No tienes permiso para realizar esta acción.' };
+    }
+  
+    // Verificar si ya existe un producto con el mismo nombre
+    const { nombre, descripcion, precio, talla, color, stock, imagen } = producto;
+    const consultaNombre = "SELECT * FROM productos WHERE nombre = $1";
+    const valoresNombre = [nombre];
+    const { rows: productosExistentes } = await pool.query(consultaNombre, valoresNombre);
+
+    if (productosExistentes.length > 0) {
+        throw { code: 400, message: `Ya existe un producto con el nombre: ${nombre}` };
+    }
+
+    //Crear producto
+    const consulta = 
+      "INSERT INTO productos (nombre, descripcion, precio, talla, color, stock, imagen) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *";
+    const valores = [nombre, descripcion, precio, talla, color, stock, imagen];
+    const { rows } = await pool.query(consulta, valores);
+    return rows; 
+  };
+
+module.exports = { agregarUser, verificarCredenciales, getUserByEmail, obtenerProductos, crearProducto }
