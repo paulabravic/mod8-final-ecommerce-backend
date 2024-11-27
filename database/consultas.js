@@ -102,9 +102,9 @@ const crearProducto = async (producto, emailUsuario) => {
   }
 
   // Verificar si ya existe un producto con el mismo nombre
-  const { nombre, descripcion, precio, talla, color, stock, imagen } = producto;
+  const { name, desc, price, talla, color, stock, img } = producto;
   const consultaNombre = "SELECT * FROM productos WHERE nombre = $1";
-  const valoresNombre = [nombre];
+  const valoresNombre = [name];
   const { rows: productosExistentes } = await pool.query(
     consultaNombre,
     valoresNombre
@@ -113,17 +113,110 @@ const crearProducto = async (producto, emailUsuario) => {
   if (productosExistentes.length > 0) {
     throw {
       code: 400,
-      message: `Ya existe un producto con el nombre: ${nombre}`,
+      message: `Ya existe un producto con el nombre: ${name}`,
     };
   }
 
   //Insert producto
   const consulta =
     "INSERT INTO productos (nombre, descripcion, precio, talla, color, stock, imagen) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *";
-  const valores = [nombre, descripcion, precio, talla, color, stock, imagen];
+  const valores = [name, desc, price, talla, color, stock, img];
   const { rows } = await pool.query(consulta, valores);
-  return rows;
+
+  const nuevoProducto = {
+    id: rows[0].producto_id,
+    name: rows[0].nombre,
+    desc: rows[0].descripcion,
+    price: parseInt(rows[0].precio, 10),
+    talla: rows[0].talla,
+    color: rows[0].color,
+    stock: rows[0].stock,
+    img: rows[0].imagen
+  };
+
+
+  console.log('nuevoProducto',nuevoProducto);
+
+  return nuevoProducto;
 };
+
+
+// Función para actualizar un producto
+const actualizarProducto = async (id, productoActualizado,emailUsuario) => {
+
+  // Verificar si el usuario es administrador
+  const rol = await obtenerRolDelUsuario(emailUsuario);
+
+  if (rol !== "administrador") {
+    throw {
+      code: 403,
+      message: "No tienes permiso para realizar esta acción.",
+    };
+  }
+
+console.log('productoActualizado',productoActualizado);
+
+  try {
+    const consulta = `
+      UPDATE productos
+      SET nombre = $1,
+          descripcion = $2,
+          precio = $3,
+          talla = $4,
+          color = $5,
+          stock = $6,
+          imagen = $7
+      WHERE producto_id = $8
+      RETURNING *;
+    `;
+
+    const valores = [
+      productoActualizado.name,
+      productoActualizado.desc,
+      productoActualizado.price,
+      productoActualizado.talla,
+      productoActualizado.color,
+      productoActualizado.stock,
+      productoActualizado.img,
+      id,
+    ];
+
+    const resultado = await pool.query(consulta, valores);
+
+    return resultado.rows;
+  } catch (error) {
+    console.error('Error al actualizar el producto:', error);
+    throw error; // Re-lanzar el error para manejarlo en la ruta
+  }
+};
+
+
+// Función para eliminar un producto
+const eliminarProducto = async (id, emailUsuario) => {
+  
+  // Verificar si el usuario es administrador
+  const rol = await obtenerRolDelUsuario(emailUsuario);
+
+  if (rol !== "administrador") {
+    throw {
+      code: 403,
+      message: "No tienes permiso para realizar esta acción.",
+    };
+  }
+
+  try {
+    const consulta = 'DELETE FROM productos WHERE producto_id = $1';
+    const valores = [id];
+
+    await pool.query(consulta, valores);
+  } catch (error) {
+    console.error('Error al eliminar el producto:', error);
+    throw error; // Re-lanzar el error para manejarlo en la ruta
+  }
+};
+
+
+
 
 module.exports = {
   agregarUser,
@@ -131,4 +224,6 @@ module.exports = {
   getUserByEmail,
   obtenerProductos,
   crearProducto,
+  actualizarProducto,
+  eliminarProducto
 };
