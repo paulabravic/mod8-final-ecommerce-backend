@@ -4,7 +4,9 @@ const {
   getUserByEmail,
   agregarUser,
   obtenerProductos,
-  crearProducto
+  crearProducto,
+  actualizarProducto,
+  eliminarProducto,
 } = require("./database/consultas");
 const {
   verificarCredencialesMiddleware,
@@ -107,6 +109,39 @@ app.post("/productos", validarTokenMiddleware, async (req, res) => {
   } catch (error) {
     console.error("Error al crear producto:", error);
     res.status(error.code || 500).json({code: error.code || 500, message: error.message}); 
+  }
+});
+
+// Ruta PUT para actualizar un producto
+app.put('/productos/:id', validarTokenMiddleware, async (req, res) => {
+  try {
+    const idProducto = parseInt(req.params.id);
+    const productoActualizado = req.body;
+    const emailUsuario = req.user.email;
+
+    // Actualizar el producto en la base de datos
+    const productoActualizadoDB = await actualizarProducto(idProducto, productoActualizado, emailUsuario);
+    
+    res.json(productoActualizadoDB);
+  } catch (error) {
+    console.error('Error al actualizar el producto:', error);
+    res.status(error.code || 500).json({ code: error.code || 500, message: error.message });
+  }
+});
+
+// Ruta DELETE para eliminar un producto
+app.delete('/productos/:id', validarTokenMiddleware, async (req, res) => {
+  try {
+    const idProducto = parseInt(req.params.id);
+    const emailUsuario = req.user.email;
+
+    // Eliminar el producto de la base de datos
+    await eliminarProducto(idProducto, emailUsuario);
+    
+    res.json({ message: 'Producto eliminado correctamente.' });
+  } catch (error) {
+    console.error('Error al eliminar el producto:', error);
+    res.status(error.code || 500).json({ code: error.code || 500, message: error.message });
   }
 });
 
