@@ -7,6 +7,9 @@ const {
   crearProducto,
   actualizarProducto,
   eliminarProducto,
+  registrarPago, 
+  crearPedido,
+  actualizarStockProductos
 } = require("./database/consultas");
 const {
   verificarCredencialesMiddleware,
@@ -144,6 +147,64 @@ app.delete('/productos/:id', validarTokenMiddleware, async (req, res) => {
     res.status(error.code || 500).json({ code: error.code || 500, message: error.message });
   }
 });
+
+
+
+//=====================================================================
+// PAGOS
+//=====================================================================
+app.post("/pagos", validarTokenMiddleware, async (req, res) => {
+  console.log('pagos',req.body);
+  try {
+    const {
+      metodoPago,
+      numeroTarjeta,
+      vencimiento,
+      ccv,
+      direccion,
+      total,
+      carrito,
+    } = req.body;
+
+    const nuevoPedido = await crearPedido(req.user.email, total, carrito); 
+
+    const response = { data: { status: "success" } }; // Simulación de respuesta exitosa
+
+    if (response.data.status === "success") {
+      const datosPago = {
+        metodoPago,
+        numeroTarjeta,
+        vencimiento,
+        ccv,
+        direccion,
+        total,
+        carrito, 
+      };
+      await registrarPago(datosPago, nuevoPedido.id); // Registrar el pago, asociándolo al nuevo pedido
+
+      //await actualizarEstadoPedido(nuevoPedido.id, "completado");
+
+      await actualizarStockProductos(carrito);
+
+      res.json({
+        message: "Pago exitoso",
+        idPedido: nuevoPedido.id, 
+      });
+    } else {
+      res.status(500).json({ 
+        code: error.code || 500, 
+        message: "Error al procesar el pago" 
+      });
+    }
+  } catch (error) {
+    console.error("Error al procesar el pago:", error);
+    res.status(error.code || 500).send({ 
+      code: error.code || 500, 
+      message: error.message 
+    });
+  }
+});
+
 
 
 

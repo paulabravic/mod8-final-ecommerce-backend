@@ -217,6 +217,104 @@ const eliminarProducto = async (id, emailUsuario) => {
 
 
 
+//=====================================================================
+// PAGO
+//=====================================================================
+const registrarPago = async (datosPago, pedidoId) => { // Agregar pedidoId como argumento
+  try {
+    const {
+      metodoPago,
+      numeroTarjeta,
+      vencimiento,
+      ccv,
+      direccion,
+      total, 
+      carrito,
+    } = datosPago;
+
+    // Consulta SQL para insertar el pago 
+    const consulta = `
+      INSERT INTO pagos (pedido_id, monto, estado_pago)
+      VALUES ($1, $2, $3) 
+      RETURNING *; 
+    `;
+
+    const valores = [
+      pedidoId, // Pasar el pedidoId como primer valor
+      total,
+      'completado'       
+    ];
+
+    const resultado = await pool.query(consulta, valores);
+    return resultado.rows; 
+
+  } catch (error) {
+    console.error("Error al registrar el pago:", error);
+    throw error;  
+  }
+};
+
+
+const crearPedido = async (emailUsuario, total, carrito) => {
+  try {
+    // 1. Obtener el user_id a partir del email
+    const consultaUsuario = "SELECT user_id FROM usuarios WHERE email = $1";
+    const valoresUsuario = [emailUsuario];
+    const { rows: usuario } = await pool.query(consultaUsuario, valoresUsuario);
+    const userId = usuario.user_id;
+
+    // 2. Insertar el nuevo pedido en la tabla 'pedidos'
+    const consultaPedido = `
+      INSERT INTO pedidos (user_id, total, estado)
+      VALUES ($1, $2, 'pendiente') 
+      RETURNING *;
+    `;
+    const valoresPedido = [userId, total];
+    const { rows: nuevoPedido } = await pool.query(consultaPedido, valoresPedido);
+    const pedidoId = nuevoPedido.pedido_id;
+
+    // 3. Insertar los detalles del pedido en la tabla 'detalles_pedido'
+    for (const producto of carrito) {
+      const { id, count, price } = producto;
+      const consultaDetalle = `
+        INSERT INTO detalles_pedido (pedido_id, producto_id, cantidad, precio) 
+        VALUES ($1, $2, $3, $4);
+      `;
+      const valoresDetalle = [pedidoId, id, count, price];
+      await pool.query(consultaDetalle, valoresDetalle);
+    }
+
+    // 4. Devolver el objeto del nuevo pedido
+    return nuevoPedido;
+  } catch (error) {
+    console.error("Error al crear el pedido:", error);
+    throw error;
+  }
+};
+
+
+const actualizarStockProductos = async (carrito) => {
+  try {
+    // Iterar sobre cada producto en el carrito
+    for (const producto of carrito) {
+      const { id, count } = producto; 
+
+      const consulta = `
+        UPDATE productos 
+        SET stock = stock - $1
+        WHERE producto_id = $2
+        RETURNING *; 
+      `;
+      const valores = [count, id];
+      await pool.query(consulta, valores); 
+    }
+  } catch (error) {
+    console.error("Error al actualizar el stock de productos:", error);
+    throw error; // Re-lanzar el error para manejarlo en la ruta 
+  }
+};
+
+
 
 module.exports = {
   agregarUser,
@@ -225,5 +323,8 @@ module.exports = {
   obtenerProductos,
   crearProducto,
   actualizarProducto,
-  eliminarProducto
+  eliminarProducto,
+  registrarPago, 
+  crearPedido,
+  actualizarStockProductos
 };
