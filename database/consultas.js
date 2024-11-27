@@ -85,7 +85,7 @@ const obtenerRolDelUsuario = async (email) => {
 //=====================================================================
 const obtenerProductos = async () => {
   const consulta =
-    "SELECT producto_id, nombre, descripcion, FLOOR(precio) AS precio, talla, color, stock, imagen FROM productos";
+    "SELECT producto_id AS id, nombre AS name, descripcion AS desc, FLOOR(precio) AS price, talla, color, stock, imagen AS img FROM productos";
   const { rows } = await pool.query(consulta);
   return rows;
 };
