@@ -3,13 +3,17 @@ const {
   verificarCredenciales,
   getUserByEmail,
   agregarUser,
+  actualizarUsuario,
   obtenerProductos,
   crearProducto,
   actualizarProducto,
   eliminarProducto,
   registrarPago, 
+  obtenerPagosUsuario,
+  obtenerTodosLosPagos,
   crearPedido,
-  actualizarStockProductos
+  actualizarStockProductos,
+  actualizarEstadoPedido
 } = require("./database/consultas");
 const {
   verificarCredencialesMiddleware,
@@ -84,9 +88,35 @@ app.get("/usuarios", validarTokenMiddleware, async (req, res) => {
   try {
     const { email } = req.user;
     const user = await getUserByEmail(email);
+    console.log('user',user);
     res.json(user);
   } catch (error) {
     res.status(500).send(error);
+  }
+});
+
+app.put("/usuarios", validarTokenMiddleware, async (req, res) => {
+  try {
+    const { nombre, 
+            email,             
+            direccion, 
+            ciudad, 
+            pais } = req.body;
+    const emailUsuario = req.user.email; 
+
+    // Actualizar al usuario en la base de datos
+    const usuarioActualizadoDB = await actualizarUsuario(emailUsuario, {
+      nombre,
+      email, 
+      direccion, 
+      ciudad, 
+      pais,
+    });
+
+    res.json(usuarioActualizadoDB);
+  } catch (error) {
+    console.error('Error al actualizar el usuario:', error);
+    res.status(error.code || 500).json({ code: error.code || 500, message: error.message });
   }
 });
 
@@ -149,10 +179,41 @@ app.delete('/productos/:id', validarTokenMiddleware, async (req, res) => {
 });
 
 
-
 //=====================================================================
 // PAGOS
 //=====================================================================
+app.get("/pagos", validarTokenMiddleware, async (req, res) => {
+  try {
+
+    // Obtener el email del token JWT
+    const emailUsuario = req.user.email;
+
+    // Obtener el user_id a partir del email
+    const usuario = await getUserByEmail(emailUsuario); 
+
+    const userId = usuario.user_id;
+    const rol = usuario.rol;
+    let pagos = [];
+
+    if (rol === 'administrador') {
+      // Obtener todos los pagos para el administrador
+      pagos = await obtenerTodosLosPagos(); 
+    } else {
+      // Obtener solo los pagos del usuario actual
+      pagos = await obtenerPagosUsuario(userId); 
+    }
+
+    if (pagos.length === 0) {
+      return res.json({ message: "No tienes pagos aún." });
+    } else {
+      res.json(pagos);
+    }
+  } catch (error) {
+    console.error("Error al obtener los pagos del usuario:", error);
+    res.status(error.code || 500).send({ code: error.code || 500, message: error.message });
+  }
+});
+
 app.post("/pagos", validarTokenMiddleware, async (req, res) => {
   console.log('pagos',req.body);
   try {
@@ -180,9 +241,9 @@ app.post("/pagos", validarTokenMiddleware, async (req, res) => {
         total,
         carrito, 
       };
-      await registrarPago(datosPago, nuevoPedido.id); // Registrar el pago, asociándolo al nuevo pedido
+      await registrarPago(datosPago, nuevoPedido.pedido_id); // Registrar el pago, asociándolo al nuevo pedido
 
-      //await actualizarEstadoPedido(nuevoPedido.id, "completado");
+      //await actualizarEstadoPedido(nuevoPedido.pedido_id, "completado");
 
       await actualizarStockProductos(carrito);
 
@@ -205,6 +266,23 @@ app.post("/pagos", validarTokenMiddleware, async (req, res) => {
   }
 });
 
+app.put("/pagos/:id", validarTokenMiddleware, async (req, res) => {
+  try {
+    const idPedido = parseInt(req.params.id);
+    const nuevoEstado = req.body.estado;
+
+    // Actualizar el estado del pedido usando la función de consultas.js
+    await actualizarEstadoPedido(idPedido, nuevoEstado);
+
+    res.json({ message: "Estado del pedido actualizado correctamente" });
+  } catch (error) {
+    console.error("Error al actualizar el estado del pedido:", error);
+    res.status(error.code || 500).send({
+      code: error.code || 500,
+      message: error.message,
+    });
+  }
+});
 
 
 

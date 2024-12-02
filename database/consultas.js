@@ -43,7 +43,7 @@ const verificarCredenciales = async (email, password) => {
 // USUARIOS
 //=====================================================================
 const getUserByEmail = async (email) => {
-    const consulta = "SELECT user_id, nombre, email, direccion, ciudad, pais, fecha_registro FROM usuarios WHERE email = $1";
+    const consulta = "SELECT user_id, nombre, email, direccion, ciudad, pais, fecha_registro, rol FROM usuarios WHERE email = $1";
     const values = [email];
     const { rows } = await pool.query(consulta, values);
     return rows[0];
@@ -77,6 +77,36 @@ const obtenerRolDelUsuario = async (email) => {
   const valores = [email];
   const { rows } = await pool.query(consulta, valores);
   return rows[0].rol;
+};
+
+const actualizarUsuario = async (emailUsuario, usuarioActualizado) => { 
+  try {
+    const consulta = `
+    UPDATE usuarios
+    SET nombre = $1,
+        email = $2,        
+        direccion = $3,
+        ciudad = $4,
+        pais = $5
+    WHERE email = $6
+    RETURNING *;
+    `;
+    
+    const valores = [
+      usuarioActualizado.nombre,
+      usuarioActualizado.email,      
+      usuarioActualizado.direccion,
+      usuarioActualizado.ciudad,
+      usuarioActualizado.pais,
+      emailUsuario 
+    ];
+
+    const resultado = await pool.query(consulta, valores);
+    return resultado.rows; 
+  } catch (error) {
+    console.error('Error al actualizar el usuario:', error);
+    throw error; 
+  }
 };
 
 
@@ -220,6 +250,52 @@ const eliminarProducto = async (id, emailUsuario) => {
 //=====================================================================
 // PAGO
 //=====================================================================
+const obtenerPagosUsuario = async (userId) => {
+  const consulta = `
+    SELECT 
+      p.pago_id,
+      p.monto AS total_pago,
+      to_char(p.fecha_pago, 'DD/MM/YYYY HH24:MI') AS fecha_pago,
+      p.estado_pago,
+      ped.pedido_id,
+      ped.fecha_pedido,
+      ped.estado AS estado_pedido,
+      json_agg(json_build_object(
+        'producto_id', dp.producto_id,
+        'nombre', prod.nombre,
+        'cantidad', dp.cantidad,
+        'precio', dp.precio
+      )) AS productos
+    FROM pagos p
+    JOIN pedidos ped ON p.pedido_id = ped.pedido_id
+    JOIN detalles_pedido dp ON ped.pedido_id = dp.pedido_id
+    JOIN productos prod ON dp.producto_id = prod.producto_id
+    WHERE ped.user_id = $1
+    GROUP BY p.pago_id, ped.pedido_id
+    ORDER BY p.fecha_pago DESC
+  `;
+  const values = [userId];
+  const { rows } = await pool.query(consulta, values);
+  return rows;
+};
+
+const obtenerTodosLosPagos = async () => {
+  try {
+    const consulta = `
+      SELECT pago_id,
+             monto AS total_pago,
+             to_char(fecha_pago, 'DD/MM/YYYY HH24:MI') AS fecha_pago,
+             estado_pago 
+      FROM pagos;
+    `;
+    const { rows } = await pool.query(consulta);
+    return rows;
+  } catch (error) {
+    console.error("Error al obtener todos los pagos:", error);
+    throw error;
+  }
+};
+
 const registrarPago = async (datosPago, pedidoId) => { // Agregar pedidoId como argumento
   try {
     const {
@@ -261,7 +337,7 @@ const crearPedido = async (emailUsuario, total, carrito) => {
     const consultaUsuario = "SELECT user_id FROM usuarios WHERE email = $1";
     const valoresUsuario = [emailUsuario];
     const { rows: usuario } = await pool.query(consultaUsuario, valoresUsuario);
-    const userId = usuario.user_id;
+    const userId = usuario[0].user_id;
 
     // 2. Insertar el nuevo pedido en la tabla 'pedidos'
     const consultaPedido = `
@@ -271,7 +347,7 @@ const crearPedido = async (emailUsuario, total, carrito) => {
     `;
     const valoresPedido = [userId, total];
     const { rows: nuevoPedido } = await pool.query(consultaPedido, valoresPedido);
-    const pedidoId = nuevoPedido.pedido_id;
+    const pedidoId = nuevoPedido[0].pedido_id;
 
     // 3. Insertar los detalles del pedido en la tabla 'detalles_pedido'
     for (const producto of carrito) {
@@ -285,7 +361,7 @@ const crearPedido = async (emailUsuario, total, carrito) => {
     }
 
     // 4. Devolver el objeto del nuevo pedido
-    return nuevoPedido;
+    return nuevoPedido[0];
   } catch (error) {
     console.error("Error al crear el pedido:", error);
     throw error;
@@ -314,17 +390,48 @@ const actualizarStockProductos = async (carrito) => {
   }
 };
 
+const actualizarEstadoPedido = async (idPedido, nuevoEstado) => {
+  try {
+    nuevoEstado = nuevoEstado.toLowerCase() || '';
+
+    // Validar el nuevo estado (opcional)
+    const estadosValidos = ["completado", "pendiente"];
+    if (!estadosValidos.includes(nuevoEstado)) {
+      throw { code: 400, message: "Estado inválido" };
+    }
+
+    // Actualizar el estado del pedido en la base de datos
+    const consulta = "UPDATE pagos SET estado_pago = $1 WHERE pago_id = $2 RETURNING *";
+    const valores = [nuevoEstado, idPedido];
+    const { rows } = await pool.query(consulta, valores);
+
+    // Verificar si se actualizó correctamente
+    if (rows.length === 0) {
+      throw { code: 404, message: "Pedido no encontrado" };
+    }
+
+    return { message: "Estado del pedido actualizado correctamente" };
+  } catch (error) {
+    console.error("Error al actualizar el estado del pedido:", error);
+    throw error; // Re-lanzar el error para manejarlo en la ruta
+  }
+};
+
 
 
 module.exports = {
   agregarUser,
   verificarCredenciales,
   getUserByEmail,
+  actualizarUsuario,
   obtenerProductos,
   crearProducto,
   actualizarProducto,
   eliminarProducto,
+  obtenerPagosUsuario,
+  obtenerTodosLosPagos,
   registrarPago, 
   crearPedido,
-  actualizarStockProductos
+  actualizarStockProductos,
+  actualizarEstadoPedido
 };
