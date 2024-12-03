@@ -13,7 +13,11 @@ const {
   obtenerTodosLosPagos,
   crearPedido,
   actualizarStockProductos,
-  actualizarEstadoPedido
+  actualizarEstadoPedido,
+  obtenerFavoritosUsuario,
+  agregarFavorito,
+  eliminarFavorito,
+  verificarFavorito
 } = require("./database/consultas");
 const {
   verificarCredencialesMiddleware,
@@ -283,6 +287,66 @@ app.put("/pagos/:id", validarTokenMiddleware, async (req, res) => {
     });
   }
 });
+
+
+//=====================================================================
+// FAVORITOS
+//=====================================================================
+app.get("/favoritos", validarTokenMiddleware, async (req, res) => {
+  try {
+    const userEmail = req.user.email;
+
+    // Obtener el user_id
+    const user = await getUserByEmail(userEmail);
+    const user_id = user.user_id;
+
+    // Obtener producto_id de la consulta (si existe)
+    const producto_id = req.query.producto_id; 
+
+    if (producto_id) {
+      // Si se proporciona producto_id, verificar si es favorito
+      const esFavorito = await verificarFavorito(user_id, producto_id);
+      res.json(esFavorito); 
+    } else {
+      // Si no se proporciona producto_id, devolver todos los favoritos
+      const productosFavoritos = await obtenerFavoritosUsuario(user_id);
+      res.json(productosFavoritos); 
+    }
+
+  } catch (error) {
+    console.error("Error al procesar la solicitud de favoritos:", error);
+    res.status(error.code || 500).send({ code: error.code || 500, message: error.message });
+  }
+});
+
+app.post("/favoritos", validarTokenMiddleware, async (req, res) => {
+  try {
+    const { producto_id } = req.body;
+    const userEmail = req.user.email;
+
+    // Obtener el user_id
+    const user = await getUserByEmail(userEmail);
+    const user_id = user.user_id;
+
+    // Verificar si el producto ya está en favoritos
+    const esFavorito = await verificarFavorito(user_id, producto_id);
+
+    if (esFavorito) {
+      // El producto ya está en favoritos, eliminarlo
+      await eliminarFavorito(user_id, producto_id);
+      res.json({ message: "Producto eliminado de favoritos." });
+    } else {
+      // El producto no está en favoritos, agregarlo
+      await agregarFavorito(user_id, producto_id);
+      res.json({ message: "Producto agregado a favoritos." });
+    }
+  } catch (error) {
+    console.error("Error al procesar la solicitud de favoritos:", error);
+    res.status(error.code || 500).send({ code: error.code || 500, message: error.message });
+  }
+});
+
+
 
 
 

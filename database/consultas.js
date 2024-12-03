@@ -330,7 +330,6 @@ const registrarPago = async (datosPago, pedidoId) => { // Agregar pedidoId como 
   }
 };
 
-
 const crearPedido = async (emailUsuario, total, carrito) => {
   try {
     // 1. Obtener el user_id a partir del email
@@ -367,7 +366,6 @@ const crearPedido = async (emailUsuario, total, carrito) => {
     throw error;
   }
 };
-
 
 const actualizarStockProductos = async (carrito) => {
   try {
@@ -418,6 +416,69 @@ const actualizarEstadoPedido = async (idPedido, nuevoEstado) => {
 };
 
 
+//=====================================================================
+// FAVORITOS
+//=====================================================================
+const obtenerFavoritosUsuario = async (user_id) => {
+  try {
+    const consulta = `
+      SELECT p.producto_id AS id, 
+             p.nombre AS name, 
+             p.descripcion AS desc, 
+             FLOOR(p.precio) AS price, 
+             p.talla, 
+             p.color, 
+             p.stock, 
+             p.imagen
+      FROM productos p
+      JOIN favoritos f ON p.producto_id = f.producto_id
+      WHERE f.user_id = $1;
+    `;
+    const values = [user_id];
+    const { rows } = await pool.query(consulta, values);
+    return rows;
+  } catch (error) {
+    console.error("Error al obtener favoritos del usuario:", error);
+    throw error;
+  }
+};
+
+const agregarFavorito = async (user_id, producto_id) => {
+  try {
+    const consulta = "INSERT INTO favoritos (user_id, producto_id) VALUES ($1, $2)";
+    const values = [user_id, producto_id];
+    await pool.query(consulta, values);
+  } catch (error) {
+    console.error("Error al agregar a favoritos:", error);
+    throw error;
+  }
+};
+
+const eliminarFavorito = async (user_id, producto_id) => {
+  try {
+    const consulta = "DELETE FROM favoritos WHERE user_id = $1 AND producto_id = $2";
+    const values = [user_id, producto_id];
+    await pool.query(consulta, values);
+  } catch (error) {
+    console.error("Error al eliminar de favoritos:", error);
+    throw error;
+  }
+};
+
+const verificarFavorito = async (user_id, producto_id) => {
+  try {
+    const consulta = "SELECT * FROM favoritos WHERE user_id = $1 AND producto_id = $2";
+    const values = [user_id, producto_id];
+    const { rowCount } = await pool.query(consulta, values);
+    return rowCount > 0;
+  } catch (error) {
+    console.error("Error al verificar favorito:", error);
+    throw error;
+  }
+};
+
+
+
 
 module.exports = {
   agregarUser,
@@ -433,5 +494,9 @@ module.exports = {
   registrarPago, 
   crearPedido,
   actualizarStockProductos,
-  actualizarEstadoPedido
+  actualizarEstadoPedido,
+  obtenerFavoritosUsuario,
+  agregarFavorito,
+  eliminarFavorito,
+  verificarFavorito
 };
