@@ -318,7 +318,7 @@ const registrarPago = async (datosPago, pedidoId) => { // Agregar pedidoId como 
     const valores = [
       pedidoId, // Pasar el pedidoId como primer valor
       total,
-      'completado'       
+      'pendiente'       
     ];
 
     const resultado = await pool.query(consulta, valores);
