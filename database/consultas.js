@@ -115,7 +115,7 @@ const actualizarUsuario = async (emailUsuario, usuarioActualizado) => {
 //=====================================================================
 const obtenerProductos = async () => {
   const consulta =
-    "SELECT producto_id AS id, nombre AS name, descripcion AS desc, FLOOR(precio) AS price, talla, color, stock, imagen AS img FROM productos";
+    "SELECT producto_id AS id, nombre AS name, descripcion AS desc, FLOOR(precio) AS price, talla, color, stock, imagen FROM productos ORDER BY producto_id";
   const { rows } = await pool.query(consulta);
   return rows;
 };
@@ -132,7 +132,7 @@ const crearProducto = async (producto, emailUsuario) => {
   }
 
   // Verificar si ya existe un producto con el mismo nombre
-  const { name, desc, price, talla, color, stock, img } = producto;
+  const { name, desc, price, talla, color, stock, imagen } = producto;
   const consultaNombre = "SELECT * FROM productos WHERE nombre = $1";
   const valoresNombre = [name];
   const { rows: productosExistentes } = await pool.query(
@@ -150,7 +150,7 @@ const crearProducto = async (producto, emailUsuario) => {
   //Insert producto
   const consulta =
     "INSERT INTO productos (nombre, descripcion, precio, talla, color, stock, imagen) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *";
-  const valores = [name, desc, price, talla, color, stock, img];
+  const valores = [name, desc, price, talla, color, stock, imagen];
   const { rows } = await pool.query(consulta, valores);
 
   const nuevoProducto = {
@@ -161,7 +161,7 @@ const crearProducto = async (producto, emailUsuario) => {
     talla: rows[0].talla,
     color: rows[0].color,
     stock: rows[0].stock,
-    img: rows[0].imagen
+    imagen: rows[0].imagen
   };
 
 
@@ -207,7 +207,7 @@ console.log('productoActualizado',productoActualizado);
       productoActualizado.talla,
       productoActualizado.color,
       productoActualizado.stock,
-      productoActualizado.img,
+      productoActualizado.imagen,
       id,
     ];
 
